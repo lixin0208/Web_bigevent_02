@@ -1,34 +1,36 @@
-//入口函数
 $(function () {
-    //1.定义校验规则
+    //1.自定义用户规则
     var form = layui.form;
-    var layer = layui.layer
 
+    
     form.verify({
         nickname: function (value) {
-            if (value.length > 6 ){
-                return "昵称长度为1-6位之间！";
+            if (value.length > 6) {
+                return "昵称长度为1~6位之间！";
             }
         }
     });
-    //2.初始化用户信息
+
+    //2.用户渲染
     initUserInfo();
-    //初始化用户信息封装，后面还要用；
+    //导出layer
+    var layer = layui.layer;
     //封装函数
     function initUserInfo() {
         $.ajax({
             method: 'GET',
             url: '/my/userinfo',
-            succcess: function (res) {
-                if (res.status !== 0) {
-                    return layer.msg('获取用户信息失败！');
-                }
-                //成功， 后渲染
+            success: function (res) {
                 // console.log(res);
-                form.val('formUserInfo', res.data)
+                if (res.status !== 0) {
+                    return layer.msg(res.message);
+                }
+                //成功，后渲染
+                form.val('formUserInfo', res.data);
             }
         })
     }
+
     //3.表单重置
     $("#btnReset").on("click", function (e) {
         //阻止重置
@@ -36,7 +38,8 @@ $(function () {
         //从新用户渲染
         initUserInfo()
     })
-    //4.修改用户信息
+
+    //修改用户信息
     $(".layui-form").on("submit", function (e) {
         //阻止默认提交
         e.preventDefault();
@@ -46,8 +49,9 @@ $(function () {
             url: '/my/userinfo',
             data: $(this).serialize(),
             success: function (res) {
+                // console.log(res);
                 if (res.status !== 0) {
-                    return layer.msg('更新用户信息失败！');
+                    return layer.msg(res.message);
                 }
                 //成功
                 layer.msg("恭喜您，修改用户信息成功！");
@@ -56,8 +60,5 @@ $(function () {
             }
         })
     })
-
-
-
 
 })
